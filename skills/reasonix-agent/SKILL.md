@@ -73,15 +73,17 @@ description: >-
 
 4. **获取结果后**：直接展示 Reasonix 的原始回答，AI 不添加转述或包装。
 
-### 3. 版本更新检查
+### 3. 版本更新检查（用户选择模式）
 
-每次调用 `reasonix_ask`/`reasonix_task` 时自动检查更新（每天最多一次）。
-- **已是最新版** → 正常返回
-- **发现新版本** → 返回 `updateAvailable: true`，AI 询问用户是否执行 `reasonix upgrade --force`
+每次调用 `reasonix_ask`/`reasonix_task` 时插件静默检查更新（每天最多一次）。
+- **已是最新版** → 正常返回结果
+- **发现新版本** → 返回 `updateAvailable: true` + 版本信息，AI 询问用户是否执行 `reasonix upgrade --force`
+- **用户确认** → 执行升级
+- **用户跳过** → 继续使用当前版本
 
-### 4. 完整安装与配置流程（从零开始）
+## 完整安装与配置流程（从零开始）
 
-#### 4.1 安装 Reasonix
+### 1. 安装 Reasonix
 
 ```bash
 # 确保已安装 Node.js（>=18）
@@ -94,7 +96,7 @@ npm i -g reasonix
 reasonix --version
 ```
 
-#### 4.2 配置 API Key
+### 2. 配置 API Key
 
 ```bash
 # 创建配置目录
@@ -104,7 +106,7 @@ mkdir -p ~/.reasonix
 echo 'YOUR_API_KEY=your-api-key-here' > ~/.reasonix/.env
 ```
 
-#### 4.3 关闭 Sandbox（可选，缺 bwrap 时需要）
+### 3. 关闭 Sandbox（可选，缺 bwrap 时需要）
 
 编辑 `~/.reasonix/config.toml`，将 `sandbox.bash` 设为 `"off"`：
 
@@ -113,20 +115,22 @@ echo 'YOUR_API_KEY=your-api-key-here' > ~/.reasonix/.env
 bash = "off"
 ```
 
-#### 4.4 注入环境变量
+### 4. 注入环境变量
 
 ```bash
 echo 'source ~/.reasonix/.env' >> ~/.bashrc
 ```
 
-#### 4.5 验证
+### 5. 验证
 
 ```bash
 reasonix doctor
 # 应显示 key_present: true ✓
 ```
 
-### 5. 更新 Reasonix
+## 更新 Reasonix
+
+插件自动检测新版本后，由用户决定是否升级：
 
 ```bash
 # 检查更新
@@ -138,7 +142,7 @@ reasonix upgrade --force
 
 更新后 `.env` 凭据不受影响。
 
-### 6. 注意事项
+## 注意事项
 
 - `reasonix_open` 会在设备浏览器中打开 Reasonix Web UI（`http://127.0.0.1:8787/`），这是最直接的对话方式
 - `reasonix_ask`/`reasonix_task` 通过 HTTP API 直连，返回 Reasonix 的原始回答，无中间包装
